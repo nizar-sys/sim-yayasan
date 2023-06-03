@@ -81,4 +81,9 @@ class Pendidik extends Model
     {
         return $this->hasMany(RiwayatSertifikatPendidik::class, 'pendidik_id', 'id');
     }
+
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class, 'pendidik_id', 'id');
+    }
 }

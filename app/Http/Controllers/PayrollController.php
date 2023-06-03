@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EducatorChildren;
+use App\Models\Payroll;
 use Illuminate\Http\Request;
-use App\Http\Requests\RequestEducatorChildren;
+use App\Http\Requests\RequestPayroll;
 use App\Models\Pendidik;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class EducatorChildrenController extends Controller
+class PayrollController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,13 +18,13 @@ class EducatorChildrenController extends Controller
      */
     public function index()
     {
-        $childrens = EducatorChildren::orderByDesc('id')
+        $payrolls = Payroll::orderByDesc('id')
         ->when(Auth::user()->educator != null, function($query) {
             return $query->where('pendidik_id', Auth::user()->educator->id);
         })
         ->get();
 
-        return view('dashboard.childrens.index', compact('childrens'));
+        return view('dashboard.payrolls.index', compact('payrolls'));
     }
 
     /**
@@ -35,12 +34,14 @@ class EducatorChildrenController extends Controller
      */
     public function create()
     {
-        $dataPendidik = Pendidik::orderByDesc('id')
-        ->when(Auth::user()->educator != null, function($query) {
-            return $query->where('id', Auth::user()->educator->id);
-        })
-        ->get(['id', 'nama']);
-        return view('dashboard.childrens.create', compact('dataPendidik'));
+        // $dataPendidik = Pendidik::orderBy('id')->get();
+
+        // cari dataPendidik yang belum ada di tabel payroll bulan ini
+        $dataPendidik = Pendidik::whereDoesntHave('payrolls', function ($query) {
+            $query->whereMonth('tanggal', date('m'));
+        })->orderBy('id')->get();
+
+        return view('dashboard.payrolls.create', compact('dataPendidik'));
     }
 
     /**
@@ -49,15 +50,15 @@ class EducatorChildrenController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RequestEducatorChildren $request)
+    public function store(RequestPayroll $request)
     {
         $validated = $request->validated() + [
             'created_at' => now(),
         ];
 
-        $children = EducatorChildren::create($validated);
+        $payroll = Payroll::create($validated);
 
-        return redirect(route('childrens.index'))->with('success', 'Data Anak Pendidik berhasil ditambahkan.');
+        return redirect(route('payrolls.index'))->with('success', 'Data penggajian berhasil ditambahkan.');
     }
 
     /**
@@ -68,7 +69,7 @@ class EducatorChildrenController extends Controller
      */
     public function show($id)
     {
-        return EducatorChildren::findOrFail($id);
+        return Payroll::findOrFail($id);
     }
 
     /**
@@ -79,14 +80,10 @@ class EducatorChildrenController extends Controller
      */
     public function edit($id)
     {
-        $children = EducatorChildren::findOrFail($id);
-        $dataPendidik = Pendidik::orderByDesc('id')
-        ->when(Auth::user()->educator != null, function($query) {
-            return $query->where('id', Auth::user()->educator->id);
-        })
-        ->get(['id', 'nama']);
+        $payroll = Payroll::findOrFail($id);
+        $dataPendidik = Pendidik::orderBy('id')->get();
 
-        return view('dashboard.childrens.edit', compact('children', 'dataPendidik'));
+        return view('dashboard.payrolls.edit', compact('payroll', 'dataPendidik'));
     }
 
     /**
@@ -96,17 +93,17 @@ class EducatorChildrenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(RequestEducatorChildren $request, $id)
+    public function update(RequestPayroll $request, $id)
     {
         $validated = $request->validated() + [
             'updated_at' => now(),
         ];
 
-        $children = EducatorChildren::findOrFail($id);
+        $payroll = Payroll::findOrFail($id);
 
-        $children->update($validated);
+        $payroll->update($validated);
 
-        return redirect(route('childrens.index'))->with('success', 'Data Anak Pendidik berhasil diperbarui.');
+        return redirect(route('payrolls.index'))->with('success', 'Data penggajian berhasil diperbarui.');
     }
 
     /**
@@ -117,9 +114,9 @@ class EducatorChildrenController extends Controller
      */
     public function destroy($id)
     {
-        $children = EducatorChildren::findOrFail($id);
-        $children->delete();
+        $payroll = Payroll::findOrFail($id);
+        $payroll->delete();
 
-        return redirect(route('childrens.index'))->with('success', 'Data Anak Pendidik berhasil dihapus.');
+        return redirect(route('payrolls.index'))->with('success', 'Data penggajian berhasil dihapus.');
     }
 }

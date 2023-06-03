@@ -6,6 +6,7 @@ use App\Models\RiwayatSertifikatPendidik;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestStoreOrUpdateRiwayatSertifikatPendidik;
 use App\Models\Pendidik;
+use Illuminate\Support\Facades\Auth;
 
 class RiwayatSertifikatPendidikController extends Controller
 {
@@ -16,8 +17,11 @@ class RiwayatSertifikatPendidikController extends Controller
      */
     public function index()
     {
-        $certificates = RiwayatSertifikatPendidik::orderByDesc('id');
-        $certificates = $certificates->paginate(50);
+        $certificates = RiwayatSertifikatPendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('pendidik_id', Auth::user()->educator->id);
+        })
+        ->get();
 
         return view('dashboard.certificates.index', compact('certificates'));
     }
@@ -29,7 +33,11 @@ class RiwayatSertifikatPendidikController extends Controller
      */
     public function create()
     {
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
         return view('dashboard.certificates.create', compact('dataPendidik'));
     }
 
@@ -70,7 +78,11 @@ class RiwayatSertifikatPendidikController extends Controller
     public function edit($id)
     {
         $certificate = RiwayatSertifikatPendidik::findOrFail($id);
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
 
         return view('dashboard.certificates.edit', compact('certificate', 'dataPendidik'));
     }

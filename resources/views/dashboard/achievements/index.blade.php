@@ -7,8 +7,9 @@
     <li class="breadcrumb-item active">Data Prestasi Siswa</li>
 @endsection
 
+
 @section('action_btn')
-    <a href="{{route('achievements.create')}}" class="btn btn-default">Tambah Data</a>
+    <a href="{{ route('achievements.create') }}" class="btn btn-default">Tambah Data</a>
 @endsection
 
 @section('content')
@@ -44,12 +45,16 @@
                                         <td>{{ $achievement->penyelenggara }}</td>
                                         <td>{{ $achievement->peringkat }}</td>
                                         <td class="d-flex jutify-content-center">
-                                            <a href="{{route('achievements.edit', $achievement->id)}}" class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></a>
-                                            <form id="delete-form-{{ $achievement->id }}" action="{{ route('achievements.destroy', $achievement->id) }}" class="d-none" method="post">
+                                            <a href="{{ route('achievements.edit', $achievement->id) }}"
+                                                class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></a>
+                                            <form id="delete-form-{{ $achievement->id }}"
+                                                action="{{ route('achievements.destroy', $achievement->id) }}"
+                                                class="d-none" method="post">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>
-                                            <button onclick="deleteForm('{{$achievement->id}}')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            <button onclick="deleteForm('{{ $achievement->id }}')"
+                                                class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 @empty
@@ -58,13 +63,6 @@
                                     </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="4">
-                                        {{ $achievements->links() }}
-                                    </th>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -75,7 +73,7 @@
 
 @section('script')
     <script>
-        function deleteForm(id){
+        function deleteForm(id) {
             Swal.fire({
                 title: 'Hapus data',
                 text: "Anda akan menghapus data!",
@@ -84,7 +82,7 @@
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 cancelButtonText: 'Batal!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     $(`#delete-form-${id}`).submit()
                 }

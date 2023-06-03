@@ -6,6 +6,7 @@ use App\Models\Achievement;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestAchievement;
 use App\Models\Siswa;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AchievementController extends Controller
@@ -17,8 +18,11 @@ class AchievementController extends Controller
      */
     public function index()
     {
-        $achievements = Achievement::orderByDesc('id');
-        $achievements = $achievements->paginate(50);
+        $achievements = Achievement::orderByDesc('id')
+        ->when(Auth::user()->student != null, function($query) {
+            return $query->where('siswa_id', Auth::user()->student->id);
+        })
+        ->get();
 
         return view('dashboard.achievements.index', compact('achievements'));
     }
@@ -30,7 +34,11 @@ class AchievementController extends Controller
      */
     public function create()
     {
-        $dataSiswa = Siswa::orderByDesc('id')->get();
+        $dataSiswa = Siswa::orderByDesc('id')
+        ->when(Auth::user()->student != null, function($query) {
+            return $query->where('id', Auth::user()->student->id);
+        })
+        ->get();
         return view('dashboard.achievements.create', compact('dataSiswa'));
     }
 
@@ -71,7 +79,11 @@ class AchievementController extends Controller
     public function edit($id)
     {
         $achievement = Achievement::findOrFail($id);
-        $dataSiswa = Siswa::orderByDesc('id')->get();
+        $dataSiswa = Siswa::orderByDesc('id')
+        ->when(Auth::user()->student != null, function($query) {
+            return $query->where('id', Auth::user()->student->id);
+        })
+        ->get();
 
         return view('dashboard.achievements.edit', compact('achievement', 'dataSiswa'));
     }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\RequestStoreOrUpdateSiswa;
 use App\Models\ParentStudent;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
@@ -18,8 +19,11 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $students = Siswa::orderByDesc('id');
-        $students = $students->paginate(50);
+        $students = Siswa::orderByDesc('id')
+        ->when(Auth::user()->student != null, function($query) {
+            return $query->where('user_id', Auth::id());
+        })
+        ->get();
 
         return view('dashboard.students.index', compact('students'));
     }

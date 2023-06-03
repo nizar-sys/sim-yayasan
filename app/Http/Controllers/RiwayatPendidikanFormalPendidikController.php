@@ -6,6 +6,7 @@ use App\Models\RiwayatPendidikanFormalPendidik;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestRiwayatPendidikanFormalPendidik;
 use App\Models\Pendidik;
+use Illuminate\Support\Facades\Auth;
 
 class RiwayatPendidikanFormalPendidikController extends Controller
 {
@@ -16,8 +17,11 @@ class RiwayatPendidikanFormalPendidikController extends Controller
      */
     public function index()
     {
-        $educations = RiwayatPendidikanFormalPendidik::orderByDesc('id');
-        $educations = $educations->paginate(50);
+        $educations = RiwayatPendidikanFormalPendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('pendidik_id', Auth::user()->educator->id);
+        })
+        ->get();
 
         return view('dashboard.educations.index', compact('educations'));
     }
@@ -29,7 +33,11 @@ class RiwayatPendidikanFormalPendidikController extends Controller
      */
     public function create()
     {
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
         return view('dashboard.educations.create', compact('dataPendidik'));
     }
 
@@ -70,7 +78,11 @@ class RiwayatPendidikanFormalPendidikController extends Controller
     public function edit($id)
     {
         $education = RiwayatPendidikanFormalPendidik::findOrFail($id);
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
 
         return view('dashboard.educations.edit', compact('education', 'dataPendidik'));
     }

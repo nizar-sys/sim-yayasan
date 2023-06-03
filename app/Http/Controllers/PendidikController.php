@@ -6,6 +6,7 @@ use App\Models\Pendidik;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestStoreOrUpdatePendidik;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class PendidikController extends Controller
@@ -17,8 +18,11 @@ class PendidikController extends Controller
      */
     public function index()
     {
-        $educators = Pendidik::orderByDesc('id');
-        $educators = $educators->paginate(50);
+        $educators = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('user_id', Auth::id());
+        })
+        ->get();
 
         return view('dashboard.educators.index', compact('educators'));
     }

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoleAccess
 {
@@ -16,7 +17,15 @@ class RoleAccess
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if(!in_array($request->user()->role, $roles)) {
+        $role = $request->user()->role;
+
+        if (Auth::user()->educator != null) {
+            $role = 'educator';
+        }elseif (Auth::user()->student != null) {
+            $role = 'student';
+        }
+
+        if(!in_array($role, $roles)) {
             return back()->with('error', 'Anda tidak memiliki akses ke halaman ini');
         }
         return $next($request);

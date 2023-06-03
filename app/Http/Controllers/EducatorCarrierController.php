@@ -6,6 +6,7 @@ use App\Models\EducatorCarrier;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestEducatorCarrier;
 use App\Models\Pendidik;
+use Illuminate\Support\Facades\Auth;
 
 class EducatorCarrierController extends Controller
 {
@@ -16,8 +17,11 @@ class EducatorCarrierController extends Controller
      */
     public function index()
     {
-        $carriers = EducatorCarrier::orderByDesc('id');
-        $carriers = $carriers->paginate(50);
+        $carriers = EducatorCarrier::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('pendidik_id', Auth::user()->educator->id);
+        })
+        ->get();
 
         return view('dashboard.carriers.index', compact('carriers'));
     }
@@ -29,7 +33,11 @@ class EducatorCarrierController extends Controller
      */
     public function create()
     {
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
         return view('dashboard.carriers.create', compact('dataPendidik'));
     }
 
@@ -70,7 +78,11 @@ class EducatorCarrierController extends Controller
     public function edit($id)
     {
         $carrier = EducatorCarrier::findOrFail($id);
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
 
         return view('dashboard.carriers.edit', compact('carrier', 'dataPendidik'));
     }

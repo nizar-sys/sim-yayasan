@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\RequestStoreOrUpdateDataPenugasanPendidik;
 use App\Models\Pendidik;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class DataPenugasanPendidikController extends Controller
@@ -18,8 +19,11 @@ class DataPenugasanPendidikController extends Controller
      */
     public function index()
     {
-        $assignments = DataPenugasanPendidik::orderByDesc('id');
-        $assignments = $assignments->paginate(50);
+        $assignments = DataPenugasanPendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('pendidik_id', Auth::user()->educator->id);
+        })
+        ->get();
 
         return view('dashboard.assignments.index', compact('assignments'));
     }
@@ -31,7 +35,11 @@ class DataPenugasanPendidikController extends Controller
      */
     public function create()
     {
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
         return view('dashboard.assignments.create', compact('dataPendidik'));
     }
 
@@ -72,7 +80,11 @@ class DataPenugasanPendidikController extends Controller
     public function edit($id)
     {
         $assignment = DataPenugasanPendidik::findOrFail($id);
-        $dataPendidik = Pendidik::orderByDesc('id')->get(['id', 'nama']);
+        $dataPendidik = Pendidik::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::user()->educator->id);
+        })
+        ->get(['id', 'nama']);
 
         return view('dashboard.assignments.edit', compact('assignment', 'dataPendidik'));
     }

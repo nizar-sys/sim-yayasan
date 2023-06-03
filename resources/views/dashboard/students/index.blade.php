@@ -7,9 +7,11 @@
     <li class="breadcrumb-item active">Data Siswa</li>
 @endsection
 
+@if (Auth::user()->role == 'admin')
 @section('action_btn')
     <a href="{{route('students.create')}}" class="btn btn-default">Tambah Data</a>
 @endsection
+@endif
 
 @section('content')
     <div class="row">
@@ -44,11 +46,13 @@
                                         <td class="d-flex jutify-content-center">
                                             <a href="{{route('students.show', $siswa->id)}}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                                             <a href="{{route('students.edit', $siswa->id)}}" class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></a>
+                                            @if (Auth::user()->role == 'admin')
                                             <form id="delete-form-{{ $siswa->id }}" action="{{ route('students.destroy', $siswa->id) }}" class="d-none" method="post">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>
                                             <button onclick="deleteForm('{{$siswa->id}}')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -57,13 +61,6 @@
                                     </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="4">
-                                        {{ $students->links() }}
-                                    </th>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>

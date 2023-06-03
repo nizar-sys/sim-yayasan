@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestStoreOrUpdateUser;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -16,8 +17,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::orderByDesc('id');
-        $users = $users->paginate(50);
+        $users = User::orderByDesc('id')
+        ->when(Auth::user()->educator != null, function($query) {
+            return $query->where('id', Auth::id());
+        })
+        ->get();
 
         return view('dashboard.users.index', compact('users'));
     }

@@ -9,6 +9,7 @@ use App\Http\Controllers\DataPribadiPendidikController;
 use App\Http\Controllers\DataTableController;
 use App\Http\Controllers\EducatorCarrierController;
 use App\Http\Controllers\EducatorChildrenController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PendidikController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatPendidikanFormalPendidikController;
@@ -37,22 +38,36 @@ require __DIR__.'/auth.php';
 # ------ Authenticated routes ------ #
 Route::middleware('auth')->group(function() {
     Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('home'); # dashboard
-    Route::resource('users', UserController::class);
 
-    Route::put('/educators/personal/{id}', [DataPribadiPendidikController::class, 'update'])->name('educators.personal.update');
-    Route::put('/educators/staff/{id}', [DataKepegawaianPendidikController::class, 'update'])->name('educators.staff.update');
-    Route::put('/educators/kontak/{id}', [DataPribadiPendidikController::class, 'updateDataKontak'])->name('educators.kontak.update');
-    Route::resource('educators', PendidikController::class);
+    Route::middleware('roles:admin,educator')->group(function(){
+        Route::resource('users', UserController::class)->middleware('roles:admin');
+        Route::put('/educators/personal/{id}', [DataPribadiPendidikController::class, 'update'])->name('educators.personal.update');
+        Route::put('/educators/staff/{id}', [DataKepegawaianPendidikController::class, 'update'])->name('educators.staff.update');
+        Route::put('/educators/kontak/{id}', [DataPribadiPendidikController::class, 'updateDataKontak'])->name('educators.kontak.update');
+        Route::resource('educators', PendidikController::class);
 
-    Route::put('/students/parent/{id}', [SiswaController::class, 'updateDataOrtu'])->name('students.parent.update');
-    Route::put('/students/kontak/{id}', [SiswaController::class, 'updateDataKontak'])->name('students.kontak.update');
-    Route::put('/students/periodik/{id}', [SiswaController::class, 'updateDataPeriodik'])->name('students.periodik.update');
-    Route::resource('students', SiswaController::class);
-    Route::resource('achievements', AchievementController::class);
+        Route::resource('assignments', DataPenugasanPendidikController::class);
+        Route::resource('certificates', RiwayatSertifikatPendidikController::class);
+        Route::resource('educations', RiwayatPendidikanFormalPendidikController::class);
+        Route::resource('childrens', EducatorChildrenController::class);
+        Route::resource('carriers', EducatorCarrierController::class);
+        Route::resource('payrolls', PayrollController::class);
 
-    Route::resource('assignments', DataPenugasanPendidikController::class);
-    Route::resource('certificates', RiwayatSertifikatPendidikController::class);
-    Route::resource('educations', RiwayatPendidikanFormalPendidikController::class);
-    Route::resource('childrens', EducatorChildrenController::class);
-    Route::resource('carriers', EducatorCarrierController::class);
+        Route::middleware('roles:admin')->group(function(){
+            Route::resource('educators', PendidikController::class)->only(['create', 'store', 'destroy']);
+            Route::resource('payrolls', PayrollController::class)->except(['index']);
+        });
+    });
+
+    Route::middleware('roles:admin,student')->group(function(){
+        Route::put('/students/parent/{id}', [SiswaController::class, 'updateDataOrtu'])->name('students.parent.update');
+        Route::put('/students/kontak/{id}', [SiswaController::class, 'updateDataKontak'])->name('students.kontak.update');
+        Route::put('/students/periodik/{id}', [SiswaController::class, 'updateDataPeriodik'])->name('students.periodik.update');
+        Route::resource('achievements', AchievementController::class);
+        Route::resource('students', SiswaController::class);
+
+        Route::middleware('roles:admin')->group(function(){
+            Route::resource('students', SiswaController::class)->only(['create', 'store', 'destroy']);
+        });
+    });
 });
