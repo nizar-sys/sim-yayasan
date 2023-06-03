@@ -20,7 +20,7 @@
                 <div class="card-header bg-transparent border-0 text-dark">
                     <h2 class="card-title h3">Data Siswa</h2>
                     <div class="table-responsive">
-                        <table class="table table-flush table-hover">
+                        <table class="table table-flush table-hover" id="table-data">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -44,6 +44,7 @@
                                         <td>{{ $siswa->no_kk }}</td>
                                         <td>{{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir }}</td>
                                         <td class="d-flex jutify-content-center">
+                                            <a target="_blank" href="{{route('students.print', $siswa->id)}}" class="btn btn-sm btn-danger"><i class="fas fa-file"></i></a>
                                             <a href="{{route('students.show', $siswa->id)}}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                                             <a href="{{route('students.edit', $siswa->id)}}" class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></a>
                                             @if (Auth::user()->role == 'admin')
@@ -86,5 +87,31 @@
                 }
             })
         }
+
+        var tablePengguna = $('#table-data').DataTable({
+            processing: false,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Cari Data",
+                lengthMenu: "Menampilkan _MENU_ data",
+                zeroRecords: "Data tidak ditemukan",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                infoFiltered: "(disaring dari _MAX_ data)",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: "<i class='fa fa-angle-right'></i>",
+                }
+            },
+            dom: 'Blfrtip',
+            buttons: [{
+                extend: 'pdfHtml5',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-sm btn-danger',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6]
+                },
+            }, ],
+
+        });
     </script>
 @endsection

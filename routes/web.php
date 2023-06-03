@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function() {
 
     Route::middleware('roles:admin,educator')->group(function(){
         Route::resource('users', UserController::class)->middleware('roles:admin');
+        Route::get('/educators/print/{id}', [DataPribadiPendidikController::class, 'print'])->name('educators.print');
         Route::put('/educators/personal/{id}', [DataPribadiPendidikController::class, 'update'])->name('educators.personal.update');
         Route::put('/educators/staff/{id}', [DataKepegawaianPendidikController::class, 'update'])->name('educators.staff.update');
         Route::put('/educators/kontak/{id}', [DataPribadiPendidikController::class, 'updateDataKontak'])->name('educators.kontak.update');
@@ -60,6 +61,7 @@ Route::middleware('auth')->group(function() {
     });
 
     Route::middleware('roles:admin,student')->group(function(){
+        Route::get('/students/print/{id}', [SiswaController::class, 'print'])->name('students.print');
         Route::put('/students/parent/{id}', [SiswaController::class, 'updateDataOrtu'])->name('students.parent.update');
         Route::put('/students/kontak/{id}', [SiswaController::class, 'updateDataKontak'])->name('students.kontak.update');
         Route::put('/students/periodik/{id}', [SiswaController::class, 'updateDataPeriodik'])->name('students.periodik.update');

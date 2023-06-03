@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RequestStoreOrUpdateDataPribadiPendidik;
 use App\Models\Pendidik;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DataPribadiPendidikController extends Controller
 {
@@ -33,5 +34,13 @@ class DataPribadiPendidikController extends Controller
         ], $payloadDataKontak);
 
         return redirect()->route('educators.show', $pendidik->id)->with('success', 'Data kontak pendidik berhasil diperbarui');
+    }
+
+    public function print($pendidikId)
+    {
+        $pendidik = Pendidik::findOrFail($pendidikId);
+
+        $pdf = \Pdf::loadView('dashboard.educators.print', compact('pendidik'));
+        return $pdf->download('cetak data diri '.$pendidik->nama.'.pdf');
     }
 }

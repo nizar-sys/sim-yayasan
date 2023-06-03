@@ -334,6 +334,22 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="no_kk">NO Kartu Keluarga</label>
+                                            <input type="number"
+                                                class="form-control @error('no_kk') is-invalid @enderror" id="no_kk"
+                                                placeholder="NO Kartu Keluarga"
+                                                value="{{ old('no_kk', $educator->dataPribadi?->no_kk) }}" name="no_kk">
+
+                                            @error('no_kk')
+                                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-12 col-md-6">
                                         <div class="form-group mb-3">
                                             <label for="nama_wajib_pajak">Nama Wajib Pajak</label>
@@ -500,14 +516,14 @@
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="form-group mb-3">
-                                            <label for="nu_ptk">NUPTK</label>
+                                            <label for="nuptk">NUPTK</label>
                                             <input type="text"
-                                                class="form-control @error('nu_ptk') is-invalid @enderror" id="nu_ptk"
+                                                class="form-control @error('nuptk') is-invalid @enderror" id="nuptk"
                                                 placeholder="NUPTK"
-                                                value="{{ old('nu_ptk', $educator->dataKepegawaian?->nu_ptk) }}"
-                                                name="nu_ptk">
+                                                value="{{ old('nuptk', $educator->dataKepegawaian?->nuptk) }}"
+                                                name="nuptk">
 
-                                            @error('nu_ptk')
+                                            @error('nuptk')
                                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

@@ -42,6 +42,8 @@
                                         <td>{{ $pendidik->tempat_lahir }}, {{ $pendidik->tanggal_lahir_formatted }}</td>
                                         <td>{{ $pendidik->nama_ibu_kandung }}</td>
                                         <td class="d-flex jutify-content-center">
+                                            <a target="_blank" href="{{ route('educators.print', $pendidik->id) }}"
+                                                class="btn btn-sm btn-danger"><i class="fas fa-file"></i></a>
                                             <a href="{{ route('educators.show', $pendidik->id) }}"
                                                 class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                                             <a href="{{ route('educators.edit', $pendidik->id) }}"

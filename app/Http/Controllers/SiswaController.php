@@ -8,6 +8,7 @@ use App\Http\Requests\RequestStoreOrUpdateSiswa;
 use App\Models\ParentStudent;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
@@ -172,5 +173,17 @@ class SiswaController extends Controller
         ], $request->all());
 
         return back()->with('success', 'Data periodik siswa berhasil diperbarui.');
+    }
+
+
+    public function print($siswaId)
+    {
+        $siswa = Siswa::findOrFail($siswaId);
+        $ayahSiswa = ParentStudent::where('siswa_id', $siswaId)->where('sebagai', 'ayah')->first();
+        $ibuSiswa = ParentStudent::where('siswa_id', $siswaId)->where('sebagai', 'ibu')->first();
+        $waliSiswa = ParentStudent::where('siswa_id', $siswaId)->where('sebagai', 'wali')->first();
+
+        $pdf = \Pdf::loadView('dashboard.students.print', compact('siswa', 'ayahSiswa', 'ibuSiswa', 'waliSiswa'));
+        return $pdf->download('cetak data diri '.$siswa->nama.'.pdf');
     }
 }
